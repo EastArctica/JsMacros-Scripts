@@ -1,0 +1,55 @@
+name: Publish Release
+
+on:
+    release:
+        types: [published]
+
+jobs:
+    Build-And-Publish:
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write
+        strategy:
+            matrix:
+                node-version: [lts/jod]
+        steps:
+            - name: Checkout the sources
+              uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.ref_name }}
+
+            - name: Install pnpm
+              uses: pnpm/action-setup@v4
+              with:
+                  version: 10.6.1
+
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ matrix.node-version }}
+                  cache: 'pnpm'
+
+            - name: Install dependencies
+              run: pnpm install
+
+            - name: Build
+              run: pnpm build
+
+            - name: Generate metadata
+              run: pnpm generate-metadata
+
+            - name: Save build artifacts in the action
+              uses: actions/upload-artifact@v4
+              with:
+                  name: Artifacts for release
+                  path: |
+                      dist/*.js
+                      dist/metadata.json
+
+            - name: Upload scripts & Metadata
+              uses: softprops/action-gh-release@v2
+              if: startsWith(github.ref, 'refs/tags/')
+              with:
+                  files: |
+                      dist/*.js
+                      dist/metadata.json

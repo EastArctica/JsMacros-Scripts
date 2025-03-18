@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+        "module": "CommonJS",
+        "target": "ES2022",
+        "lib": ["ES2022"],
+        "outDir": "./dist",
+        "skipLibCheck": true,
+        "typeRoots": [],
+        "isolatedModules": true,
+        "esModuleInterop": true
+    },
+    "include": ["src/**/*.ts", "headers/*.d.ts"],
+    "exclude": ["dist/*"],
+    "skipLibCheck": true
+}
