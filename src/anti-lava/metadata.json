@@ -1,5 +1,5 @@
 {
-    "version": "1.0.0",
+    "version": "0.1.0",
     "title": "Anti Lava",
     "description": "Automatically place blocks in lava source blocks around any broken blocks. Uses the offhand for placing blocks and attempts to auto-restock."
 }
