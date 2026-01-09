@@ -1,0 +1,5 @@
+{
+    "version": "0.1.0",
+    "title": "LiDAR",
+    "description": "A cool idea from U9G. Simple lidar scanner that disables rendering and allows the player to only see LiDAR points around them."
+}
