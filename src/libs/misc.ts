@@ -41,3 +41,26 @@ export function getActiveScreenTitle(): string | null {
         return (activeScreen()?.getTitleText() as unknown as string) ?? null;
     }
 }
+
+/**
+ * Determines whether or not the Minecraft world has been properly initialized.
+ *
+ * TODO: isClientInitialized isn't the best name for this function as the client
+ * is always initialized, but the world and player may not be.
+ *
+ * @returns Whether or not the world has been properly initialized
+ */
+export function isClientInitialized(): boolean {
+    try {
+        const player = Player.getPlayer();
+        if (!player) return false;
+
+        // Check if we can get world data
+        const dimension = World.getDimension();
+        if (!dimension) return false;
+    } catch (_) {
+        return false;
+    }
+
+    return true;
+}
