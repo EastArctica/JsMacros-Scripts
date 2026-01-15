@@ -1,0 +1,5 @@
+{
+    "version": "0.1.0",
+    "title": "Planner Data Exporter",
+    "description": "Exports planner data to a specified format for further analysis or sharing."
+}

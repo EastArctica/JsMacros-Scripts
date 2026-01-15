@@ -38,7 +38,8 @@ type Command = {
     itemSlotArg?: string;
     particleArg?: string;
 
-    executes?: (contextHelper: CommandContextHelper) => void;
+    executes?: (contextHelper: CommandContextHelper) => void | Promise<void>;
+    executesAsync?: (contextHelper: CommandContextHelper) => void | Promise<void>;
     suggest?: (contextHelper: CommandContextHelper, suggestionHelper: SuggestionsBuilderHelper) => void;
     suggestMatching?: string[];
     suggestIdentifier?: string[];
@@ -57,6 +58,8 @@ class CommandBuilderWrapper {
         for (const command of commands) {
             this.processCommand(command);
         }
+
+        return this.builder;
     }
 
     processCommand(command: Command) {
@@ -130,8 +133,14 @@ class CommandBuilderWrapper {
                 builder = builder.suggestBlockPositions(node.suggestBlockPositions);
             }
 
+            if (node.executes && node.executesAsync) {
+                throw new Error('Cannot have both executes and executesAsync defined on the same command node.');
+            }
+
             if (node.executes) {
                 builder = builder.executes(JavaWrapper.methodToJava(node.executes));
+            } else if (node.executesAsync) {
+                builder = builder.executes(JavaWrapper.methodToJavaAsync(node.executesAsync));
             }
 
             if (node.suggest) {
@@ -154,10 +163,12 @@ class CommandBuilderWrapper {
 
     register() {
         this.builder.register();
+        return this.builder;
     }
 
     unregister() {
         this.builder.unregister();
+        return this.builder;
     }
 }
 

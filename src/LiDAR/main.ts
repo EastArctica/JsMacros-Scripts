@@ -146,7 +146,7 @@ function getBlockColorFallback(blockState, blockPos) {
         // Fall back to map color if no tint color is available
         const mapColor = blockState.getMapColor(Player.getPlayer().getRaw().level(), blockPos);
         return mapColor.col & 0xffffff;
-    } catch (e) {
+    } catch (_e) {
         // If all else fails, return white
         return 0xffffff;
     }

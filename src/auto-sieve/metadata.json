@@ -1,0 +1,5 @@
+{
+    "version": "0.1.0",
+    "title": "Auto sieve",
+    "description": "Detects clicks on sieves and automatically completes the sieving."
+}

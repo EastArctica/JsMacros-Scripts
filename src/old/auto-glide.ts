@@ -1,0 +1,1 @@
+JsMacros.assertEvent(event, 'Service');

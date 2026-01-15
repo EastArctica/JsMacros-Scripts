@@ -1,0 +1,5 @@
+{
+    "version": "0.1.0",
+    "title": "oplegends bot",
+    "description": "Bot for OPLegends. Uses a KeyBind reimplementation to bypass screen requirements."
+}

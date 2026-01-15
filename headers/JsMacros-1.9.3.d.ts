@@ -1838,7 +1838,7 @@ declare namespace JavaWrapper {
 
 /**
  * Functions that interact directly with JsMacros or Events.  
- *
+ *  <pd
  * @author Wagyourtail
  */
 declare namespace JsMacros {
@@ -25059,7 +25059,7 @@ declare namespace Packages {
                              * @author Etheradon
                              * @since 1.8.4
                              */
-                            abstract class RecipeInventory<T = /* net.minecraft.client.gui.screen.ingame.HandledScreen<net.minecraft.screen.AbstractRecipeScreenHandler<any>> */ any> extends Inventory<T> {
+                            abstract class RecipeInventory<T = /* net.minecraft.client.gui.screen.ingame.HandledScreen<net.minecraft.screen.AbstractRecipeScreenHandler<any, any>> */ any> extends Inventory<T> {
                                 static readonly class: JavaClass<RecipeInventory<any>>;
                                 /** @deprecated */ static prototype: undefined;
 
@@ -26744,8 +26744,8 @@ declare namespace Packages {
 
                                 /** @since 1.2.7 */
                                 getScreenClassName(): string;
-                                /** @since 1.0.5 */
-                                getTitleText(): string;
+                                /** @since 1.0.5 (TextHelper since 1.9.3) */
+                                getTitleText(): xyz.wagyourtail.jsmacros.client.api.helpers.TextHelper;
 
                                 /**
                                  * in `1.3.1` updated to work with all button widgets not just ones added by scripts.
@@ -30013,7 +30013,7 @@ declare namespace Packages {
                                      * @since 1.9.0
                                      */
                                     setYOffset(yOffset: double): this;
-                                    render(drawContext: /* net.minecraft.client.gui.DrawContext */ any, builder: /* net.minecraft.client.render.BufferBuilder */ any, tickDelta: float): void;
+                                    render(drawContext: /* net.minecraft.client.gui.DrawContext */ any, tickDelta: float): void;
 
                                 }
 
@@ -30777,7 +30777,7 @@ declare namespace Packages {
                                      */
                                     setAlpha(alpha: int): this;
                                     compareToSame(other: TraceLine): number;
-                                    render(drawContext: /* net.minecraft.client.gui.DrawContext */ any, builder: /* net.minecraft.client.render.BufferBuilder */ any, tickDelta: float): void;
+                                    render(drawContext: /* net.minecraft.client.gui.DrawContext */ any, tickDelta: float): void;
 
                                 }
 
@@ -35340,12 +35340,12 @@ declare namespace Packages {
                              * @author Etheradon
                              * @since 1.8.4
                              */
-                            class EnchantmentHelper extends xyz.wagyourtail.jsmacros.core.helpers.BaseHelper</* net.minecraft.enchantment.Enchantment */ any> {
+                            class EnchantmentHelper extends xyz.wagyourtail.jsmacros.core.helpers.BaseHelper</* net.minecraft.registry.entry.RegistryEntry<net.minecraft.enchantment.Enchantment> */ any> {
                                 static readonly class: JavaClass<EnchantmentHelper>;
                                 /** @deprecated */ static prototype: undefined;
 
-                                constructor (base: /* net.minecraft.enchantment.Enchantment */ any);
-                                constructor (base: /* net.minecraft.enchantment.Enchantment */ any, level: int);
+                                constructor (base: /* net.minecraft.registry.entry.RegistryEntry<net.minecraft.enchantment.Enchantment> */ any);
+                                constructor (base: /* net.minecraft.registry.entry.RegistryEntry<net.minecraft.enchantment.Enchantment> */ any, level: int);
                                 constructor (enchantment: CanOmitNamespace<EnchantmentId>);
 
                                 /**
@@ -35431,12 +35431,6 @@ declare namespace Packages {
                                  * @since 1.8.4
                                  */
                                 getCompatibleEnchantments(ignoreType: boolean): JavaList<EnchantmentHelper>;
-
-                                /**
-                                 * @return the type of item this enchantment is compatible with.
-                                 * @since 1.8.4
-                                 */
-                                getTargetType(): EnchantmentTargetType;
 
                                 /**
                                  * The weight of an enchantment is bound to its rarity. The higher the weight, the more likely
@@ -36371,24 +36365,32 @@ declare namespace Packages {
                                  * @return self for chaining.
                                  */
                                 enabledTexture(enabled: /* net.minecraft.util.Identifier */ any): this;
+                                /** @since 1.9.3 */
+                                enabledTexture(enabled: string): ButtonWidgetHelper$TexturedButtonBuilder;
 
                                 /**
                                  * @since 1.9.0
                                  * @return self for chaining.
                                  */
                                 disabledTexture(disabled: /* net.minecraft.util.Identifier */ any): this;
+                                /** @since 1.9.3 */
+                                disabledTexture(disabled: string): ButtonWidgetHelper$TexturedButtonBuilder;
 
                                 /**
                                  * @since 1.9.0
                                  * @return self for chaining.
                                  */
                                 enabledFocusedTexture(enabledFocused: /* net.minecraft.util.Identifier */ any): this;
+                                /** @since 1.9.3 */
+                                enabledFocusedTexture(enabledFocused: string): ButtonWidgetHelper$TexturedButtonBuilder;
 
                                 /**
                                  * @since 1.9.0
                                  * @return self for chaining.
                                  */
                                 disabledFocusedTexture(disabledFocused: /* net.minecraft.util.Identifier */ any): this;
+                                /** @since 1.9.3 */
+                                disabledFocusedTexture(disabledFocused: string): ButtonWidgetHelper$TexturedButtonBuilder;
                                 createWidget(): ButtonWidgetHelper</* net.minecraft.client.gui.widget.TexturedButtonWidget */ any>;
 
                             }
@@ -38864,6 +38866,7 @@ declare namespace Packages {
                                     /**
                                      * @param yaw (was pitch prior to 1.2.6)
                                      * @param pitch (was yaw prior to 1.2.6)
+                                     * @return self for chaining.
                                      * @since 1.0.3
                                      */
                                     lookAt(yaw: double, pitch: double): ClientPlayerEntityHelper<T>;
@@ -38894,6 +38897,21 @@ declare namespace Packages {
                                      * @since 1.8.4
                                      */
                                     tryLookAt(pos: xyz.wagyourtail.jsmacros.client.api.helpers.world.BlockPosHelper): boolean;
+
+                                    /**
+                                     * NOTE: This is a custom method. This does not exist in JsMacros and is exclusive to JsMacrosCE.
+                                     * @param pos the position of the block to find angles for
+                                     * @return an array of floats where index 0 is yaw and index 1 is pitch, or `null` if no angles were found.
+                                     */
+                                    tryFindAngles(pos: xyz.wagyourtail.jsmacros.client.api.helpers.world.BlockPosHelper): JavaArray<number>;
+
+                                    /**
+                                     * NOTE: This is a custom method. This does not exist in JsMacros and is exclusive to JsMacrosCE.
+                                     * @param pos the position of the block to find angles for
+                                     * @param face the face of the block to look at ("north", "south", "east", "west", "up", "down")
+                                     * @return an array of floats where index 0 is yaw and index 1 is pitch, or `null` if no angles were found.
+                                     */
+                                    tryFindAngles(pos: xyz.wagyourtail.jsmacros.client.api.helpers.world.BlockPosHelper, face: string): JavaArray<number>;
 
                                     /**
                                      * @return self for chaining.
@@ -42707,6 +42725,7 @@ declare namespace Packages {
 
                     /**
                      * override to return true if the method can't join to the context it was wrapped/created in, ie for languages that don't allow multithreading.
+                     * @deprecated
                      */
                     preventSameScriptJoin(): boolean;
 
@@ -44731,7 +44750,7 @@ type ProxyBuilder<T = any> = Packages.xyz.wagyourtail.jsmacros.core.library.impl
 type PufferfishEntityHelper = Packages.xyz.wagyourtail.jsmacros.client.api.helpers.world.entity.specialized.passive.PufferfishEntityHelper;
 type RabbitEntityHelper = Packages.xyz.wagyourtail.jsmacros.client.api.helpers.world.entity.specialized.passive.RabbitEntityHelper;
 type RecipeHelper = Packages.xyz.wagyourtail.jsmacros.client.api.helpers.inventory.RecipeHelper;
-type RecipeInventory<T = /* net.minecraft.client.gui.screen.ingame.HandledScreen<net.minecraft.screen.AbstractRecipeScreenHandler<any>> */ any> = Packages.xyz.wagyourtail.jsmacros.client.api.classes.inventory.RecipeInventory<T>;
+type RecipeInventory<T = /* net.minecraft.client.gui.screen.ingame.HandledScreen<net.minecraft.screen.AbstractRecipeScreenHandler<any, any>> */ any> = Packages.xyz.wagyourtail.jsmacros.client.api.classes.inventory.RecipeInventory<T>;
 type Rect = Packages.xyz.wagyourtail.jsmacros.client.api.classes.render.components.Rect;
 type Rect$Builder = Packages.xyz.wagyourtail.jsmacros.client.api.classes.render.components.Rect$Builder;
 type Registrable<R = any> = Packages.xyz.wagyourtail.jsmacros.core.classes.Registrable<R>;
