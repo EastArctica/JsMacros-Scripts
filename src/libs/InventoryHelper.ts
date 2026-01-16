@@ -1,39 +1,84 @@
+import { inv } from '../donut-smp-bone-macro/util';
 import ChatHelper from './ChatHelper';
 
 /**
- * Splits a stack in a given slot into two slots.
- * The split is done by picking up the stack and using the split operation.
+ * Splits a stack in a given slot to achieve a target count in the target slot.
+ * The split is done optimally using drag-click operations to distribute items.
  *
  * @param sourceSlot The slot containing the stack to split
- * @param targetSlot The empty slot to split into (can be an empty slot or the original slot)
+ * @param targetSlot The slot to move items into (can be empty or contain items)
+ * @param targetCount The desired count to achieve in the target slot
  * @returns An object containing the counts in both slots after splitting, or null on failure
  */
 export function splitStack(
     sourceSlot: number,
-    targetSlot: number
+    targetSlot: number,
+    targetCount: number
 ): { sourceCount: number; targetCount: number } | null {
-    const inventory = Player.openInventory();
-
     try {
-        // Pick up the stack
-        inventory.click(sourceSlot);
-        // Wait a tick for pickup
-        Client.waitTick();
+        const sourceItem = inv().getSlot(sourceSlot);
+        const targetItem = inv().getSlot(targetSlot);
 
-        // Split into target slot and back to source slot
-        inventory.split(targetSlot, sourceSlot);
-        Client.waitTick();
+        const sourceCount = sourceItem.getCount();
+        const currentTargetCount = targetItem.getCount();
+        Chat.log(
+            `Moving from slot ${sourceSlot} (${sourceCount}) to slot ${targetSlot} (${currentTargetCount}) to reach ${targetCount}`
+        );
 
-        // Re-get inventory after split to ensure fresh state
+        // Validate that we can move items
+        if (sourceCount === 0) {
+            ChatHelper.error('Source slot is empty');
+            return null;
+        }
+
+        // Check if target slot is empty or has the same item
+        if (!targetItem.isEmpty() && targetItem.getItemId() !== sourceItem.getItemId()) {
+            ChatHelper.error('Target slot contains a different item');
+            return null;
+        }
+
+        // Calculate how many items we need to move
+        const itemsToMove = targetCount - currentTargetCount;
+
+        if (itemsToMove <= 0) {
+            ChatHelper.log(`Target already has ${currentTargetCount} items (target: ${targetCount})`);
+            return { sourceCount, targetCount: currentTargetCount };
+        }
+
+        if (itemsToMove > sourceCount) {
+            ChatHelper.error(`Not enough items in source (need ${itemsToMove}, have ${sourceCount})`);
+            return null;
+        }
+
+        // TODO: Optimize this with right clicks and drag clicks
+
+        // Pick up the entire stack from source
+        inv().click(sourceSlot);
+
+        let remaining = itemsToMove;
+        while (remaining > 0) {
+            // Place single item with right-click
+            inv().click(targetSlot, 1);
+            remaining--;
+        }
+
+        // Place any remaining items back in source
+        if (!inv().getHeld().isEmpty()) {
+            inv().click(sourceSlot);
+        }
+
+        // Re-get inventory after operations to ensure fresh state
         const invAfterSplit = Player.openInventory();
 
         // Get the counts in both slots
-        const sourceCount = invAfterSplit.getSlot(sourceSlot).getCount();
-        const targetCount = invAfterSplit.getSlot(targetSlot).getCount();
+        const finalSourceCount = invAfterSplit.getSlot(sourceSlot).getCount();
+        const finalTargetCount = invAfterSplit.getSlot(targetSlot).getCount();
 
-        ChatHelper.log(`Split stack: slot ${sourceSlot} (${sourceCount}), slot ${targetSlot} (${targetCount})`);
+        ChatHelper.log(
+            `Split stack: slot ${sourceSlot} (${finalSourceCount}), slot ${targetSlot} (${finalTargetCount})`
+        );
 
-        return { sourceCount, targetCount };
+        return { sourceCount: finalSourceCount, targetCount: finalTargetCount };
     } catch (error) {
         ChatHelper.error(`Failed to split stack: ${error}`);
         return null;
@@ -89,11 +134,7 @@ export function prepareItemInHotbar(itemId: string, maxCount: number, hotbarSlot
     // Prefer best fit, otherwise use smallest overflow and split it
     if (bestFitSlot !== -1) {
         targetSlot = bestFitSlot;
-        ChatHelper.log(`Selected stack of ${bestFitCount} ${itemId} from slot ${bestFitSlot}`);
     } else if (smallestOverflowSlot !== -1) {
-        // Need to split the stack
-        ChatHelper.log(`Stack of ${smallestOverflowCount} is too large for max ${maxCount}, splitting...`);
-
         // Find an empty slot to split into
         const emptySlot = inventory.findFreeInventorySlot();
         if (emptySlot === -1) {
@@ -101,8 +142,8 @@ export function prepareItemInHotbar(itemId: string, maxCount: number, hotbarSlot
             return -1;
         }
 
-        // Split the stack
-        const splitResult = splitStack(smallestOverflowSlot, emptySlot);
+        // Split the stack - try to get maxCount items in the empty slot
+        const splitResult = splitStack(smallestOverflowSlot, emptySlot, maxCount);
         if (splitResult === null) {
             return -1;
         }
@@ -116,8 +157,6 @@ export function prepareItemInHotbar(itemId: string, maxCount: number, hotbarSlot
             // If neither fits exactly (edge case), use the smaller one
             targetSlot = splitResult.sourceCount <= splitResult.targetCount ? smallestOverflowSlot : emptySlot;
         }
-
-        ChatHelper.log(`Using slot ${targetSlot} after split`);
     } else {
         ChatHelper.error(`No valid ${itemId} stack found`);
         return -1;
