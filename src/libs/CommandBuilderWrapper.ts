@@ -64,6 +64,13 @@ class CommandBuilderWrapper {
 
     processCommand(command: Command) {
         const applyArgs = (node: Command, builder: CommandBuilder): CommandBuilder => {
+            let nodeSum = 1;
+            for (const key in node) {
+                if (key !== 'children' && key !== 'executes' && key !== 'executesAsync' && key !== 'suggest') {
+                    nodeSum++;
+                }
+            }
+
             if (node.literalArg) builder = builder.literalArg(node.literalArg);
             if (node.booleanArg) builder = builder.booleanArg(node.booleanArg);
 
@@ -153,7 +160,9 @@ class CommandBuilderWrapper {
                 });
             }
 
-            builder = builder.or();
+            for (let i = 0; i < nodeSum - 1; i++) {
+                builder = builder.or();
+            }
             return builder;
         };
 
