@@ -115,4 +115,5 @@ event.stopListener = JavaWrapper.methodToJava(() => {
     ungloww();
     for (const unglow of glowMap.values()) unglow();
 });
+
 export default event;

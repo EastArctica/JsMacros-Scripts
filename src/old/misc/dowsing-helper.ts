@@ -42,3 +42,5 @@ JsMacros.on(
 
 // bye draw3d
 event.unregisterOnStop(true, d3d);
+
+export default event;

@@ -30,3 +30,5 @@ event.stopListener = JavaWrapper.methodToJava(() => {
     d3d.unregister();
     // JsMacros.off(tickListener);
 });
+
+export default event;

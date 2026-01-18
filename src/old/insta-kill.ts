@@ -391,3 +391,5 @@ function main() {
     }
 }
 main();
+
+export default event;

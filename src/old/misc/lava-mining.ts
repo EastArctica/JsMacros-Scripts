@@ -57,3 +57,5 @@ JsMacros.on(
         }
     })
 );
+
+export default event;

@@ -68,3 +68,5 @@ JsMacros.on(
         handleCaptcha(Player.openInventory());
     })
 );
+
+export default event;

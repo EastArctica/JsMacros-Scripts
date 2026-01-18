@@ -41,3 +41,5 @@ switch (heldItem.getItemID()) {
         //chat.log('not holding item for breeding');
         break;
 }
+
+export default event;

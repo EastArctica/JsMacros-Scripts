@@ -34,3 +34,5 @@ event.stopListener = JavaWrapper.methodToJava(() => {
     d2d.unregister();
     JsMacros.off(tickListener);
 });
+
+export default event;

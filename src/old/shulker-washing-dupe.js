@@ -67,3 +67,5 @@ function dupe() {
 }
 
 for (let i = 0; i < 10; i++) dupe();
+
+export default event;

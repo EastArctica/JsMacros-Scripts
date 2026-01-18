@@ -61,3 +61,5 @@ const tickListener = JsMacros.on(
 event.stopListener = JavaWrapper.methodToJava(() => {
     JsMacros.off(tickListener);
 });
+
+export default event;

@@ -12,3 +12,5 @@ for (let i = 0; i < 1; i++) {
     player.interactBlock(-237, 101, -380, 0, false);
     Client.waitTick(7);
 }
+
+export default event;

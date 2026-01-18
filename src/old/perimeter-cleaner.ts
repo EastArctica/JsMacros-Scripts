@@ -39,3 +39,5 @@ for (let i = 0; i < blocks.length; i++) {
     blockGlow[i]();
 }
 Player.interactions().clearTargetOverride();
+
+export default event;

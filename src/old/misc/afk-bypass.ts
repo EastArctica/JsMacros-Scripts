@@ -47,3 +47,5 @@ JsMacros.on(
         tick++;
     })
 );
+
+export default event;

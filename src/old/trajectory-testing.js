@@ -88,3 +88,5 @@ function drawTrajectoryPath(points) {
         );
     }
 }
+
+export default event;

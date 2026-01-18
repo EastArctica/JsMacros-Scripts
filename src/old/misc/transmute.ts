@@ -48,3 +48,5 @@ for (let i = 0; i < 25; i++) {
     dropItemsAtAngle(input.id, input.count, 180, 8);
     Time.sleep(10);
 }
+
+export default event;

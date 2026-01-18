@@ -99,3 +99,5 @@ for (const lib of javaLibs) {
     loadedLibraries[lib] = child;
 }
 Chat.log('Loaded java libraries');
+
+export default event;

@@ -78,3 +78,5 @@ for (let i = 0; i < 10000; i++) {
     // Give the game a little bit of time to process the items
     Time.sleep(100);
 }
+
+export default event;

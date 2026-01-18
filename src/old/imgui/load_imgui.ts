@@ -103,3 +103,5 @@ instrumentation.redefineClasses(
 // if (ctClass.isFrozen()) ctClass.defrost()
 // ctClass.getDeclaredMethod("method_46529").setBody(`{ return true; }`)
 // instrumentation.redefineClasses(new java.lang.instrument.ClassDefinition(Reflection.getClass(ctClass.getName()), ctClass.toBytecode()))
+
+export default event;

@@ -11,3 +11,5 @@ for (let x = 0; x <= 16; x++) {
         }
     }
 }
+
+export default event;

@@ -37,3 +37,5 @@ for (const pos of bedrocks) {
 }
 
 Chat.log('done');
+
+export default event;

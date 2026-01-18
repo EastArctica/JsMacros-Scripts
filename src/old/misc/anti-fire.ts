@@ -40,3 +40,5 @@ event.stopListener = JavaWrapper.methodToJava(() => {
     JsMacros.off(blockUpdateListener);
     JsMacros.off(tickListener);
 });
+
+export default event;
