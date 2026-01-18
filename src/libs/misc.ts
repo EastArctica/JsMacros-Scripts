@@ -64,3 +64,28 @@ export function isClientInitialized(): boolean {
 
     return true;
 }
+
+export function shortNumber(num: number): string {
+    num = Math.floor(num);
+
+    if (num >= 1_000_000_000) {
+        return `${(num / 1_000_000_000).toFixed(1).replace(/\.0$/, '')}b`;
+    }
+    if (num >= 1_000_000) {
+        return `${(num / 1_000_000).toFixed(1).replace(/\.0$/, '')}m`;
+    }
+    if (num >= 1_000) {
+        return `${(num / 1_000).toFixed(1).replace(/\.0$/, '')}k`;
+    }
+    return num.toString();
+}
+
+export function distToMetric(pos: BlockPosHelper): string {
+    const playerPos = Player.getPlayer().getBlockPos();
+    const dx = pos.getX() - playerPos.getX();
+    const dy = pos.getY() - playerPos.getY();
+    const dz = pos.getZ() - playerPos.getZ();
+    const distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
+
+    return `${shortNumber(distance)}m`;
+}
