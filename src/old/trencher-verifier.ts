@@ -6,21 +6,33 @@ CommandManager.unregisterCommand('verify-trencher');
 // If so, print the chunk coordinates and the number of such stacks
 
 const builder = CommandManager.createCommandBuilder('verify-trencher')
-                              .blockPosArg('from').suggest(JavaWrapper.methodToJava((context, builder) => {
-                                let targetPos = Player.rayTraceBlock(500, false).getBlockPos();
-                                return builder.suggestMatching(`${targetPos.getX()} ${targetPos.getY()} ${targetPos.getZ()}`);
-                              }))
-                              .blockPosArg('to').suggest(JavaWrapper.methodToJava((context, builder) => {
-                                let targetPos = Player.rayTraceBlock(500, false).getBlockPos();
-                                return builder.suggestMatching(`${targetPos.getX()} ${targetPos.getY()} ${targetPos.getZ()}`);
-                              }))
-                              .executes(JavaWrapper.methodToJava((context) => {
-                                verifyTrencher(context.getArg('from'), context.getArg('to'));
-                              }));
+    .blockPosArg('from')
+    .suggest(
+        JavaWrapper.methodToJava((context, builder) => {
+            let targetPos = Player.rayTraceBlock(500, false).getBlockPos();
+            return builder.suggestMatching(`${targetPos.getX()} ${targetPos.getY()} ${targetPos.getZ()}`);
+        })
+    )
+    .blockPosArg('to')
+    .suggest(
+        JavaWrapper.methodToJava((context, builder) => {
+            let targetPos = Player.rayTraceBlock(500, false).getBlockPos();
+            return builder.suggestMatching(`${targetPos.getX()} ${targetPos.getY()} ${targetPos.getZ()}`);
+        })
+    )
+    .executes(
+        JavaWrapper.methodToJava((context) => {
+            verifyTrencher(context.getArg('from'), context.getArg('to'));
+        })
+    );
 builder.register();
 
 let scanner = World.getWorldScanner()
-    .withBlockFilter('getId').is('MATCHES', '^minecraft:(sand|red_sand|gravel|anvil|chipped_anvil|damaged_anvil|dragon_egg|(?:[a-z_]+_)?concrete_powder)$')
+    .withBlockFilter('getId')
+    .is(
+        'MATCHES',
+        '^minecraft:(sand|red_sand|gravel|anvil|chipped_anvil|damaged_anvil|dragon_egg|(?:[a-z_]+_)?concrete_powder)$'
+    )
     .build();
 
 function verifyTrencher(from, to) {
@@ -34,7 +46,7 @@ function verifyTrencher(from, to) {
     Chat.log('Searching for blocks');
     const blocks = scanner.scanCubeAreaInclusive(from, to);
 
-    Chat.log('Found blocks')
+    Chat.log('Found blocks');
     // Map<string, Array<number>> of XZ block coords to y values
     const blocks2D = new Map();
     for (const block of blocks) {

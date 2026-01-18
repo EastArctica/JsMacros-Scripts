@@ -1,15 +1,17 @@
 const world = Client.getMinecraft().field_1687;
 const DISCARDED = Java.type('net.minecraft.class_1297').class_5529.field_26999; // Entity.RemovalReason.DISCARDED
 
-const ShulkerEntityHelper = Packages.xyz.wagyourtail.jsmacros.client.api.helpers.world.entity.specialized.mob.ShulkerEntityHelper;
+const ShulkerEntityHelper =
+    Packages.xyz.wagyourtail.jsmacros.client.api.helpers.world.entity.specialized.mob.ShulkerEntityHelper;
 const ShulkerEntity = Java.type('net.minecraft.class_1606'); // ShulkerEntity
 const ShulkerEntityType = Java.type('net.minecraft.class_1299').field_6109; // EntityType.SHULKER
 
-const BlockDisplayEntityHelper = Packages.xyz.wagyourtail.jsmacros.client.api.helpers.world.entity.specialized.display.BlockDisplayEntityHelper;
+const BlockDisplayEntityHelper =
+    Packages.xyz.wagyourtail.jsmacros.client.api.helpers.world.entity.specialized.display.BlockDisplayEntityHelper;
 const BlockDisplayEntity = Java.type('net.minecraft.class_8113').class_8115; // DisplayEntity.BlockDisplayEntity
 const BlockDisplayEntityType = Java.type('net.minecraft.class_1299').field_42460; // EntityType.BLOCK_DISPLAY
 
-export function glowBlock(x: number, y: number, z: number, color: number = 0xFFFFFF) {
+export function glowBlock(x: number, y: number, z: number, color: number = 0xffffff) {
     x = Math.floor(x) + 0.5;
     y = Math.floor(y);
     z = Math.floor(z) + 0.5;
@@ -32,8 +34,8 @@ export function glowBlock(x: number, y: number, z: number, color: number = 0xFFF
             Chat.log('World.getEntities() is not available');
             return false;
         }
-        let ent = World.getEntities().find(ent => ent.getUUID() == entUUID);
+        let ent = World.getEntities().find((ent) => ent.getUUID() == entUUID);
         ent.getRaw().method_5650(DISCARDED);
         return true;
-    }
+    };
 }

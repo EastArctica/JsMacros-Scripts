@@ -1,20 +1,25 @@
 import CommandBuilderWrapper from '../libs/CommandBuilderWrapper';
 import Config from '../libs/Config';
-const PhantomEntityHelper = Packages.xyz.wagyourtail.jsmacros.client.api.helpers.world.entity.specialized.mob.PhantomEntityHelper;
+const PhantomEntityHelper =
+    Packages.xyz.wagyourtail.jsmacros.client.api.helpers.world.entity.specialized.mob.PhantomEntityHelper;
 // @ts-expect-error from Etheradon/GraalBridge
-Graal.loadMappings("mojmap");
+Graal.loadMappings('mojmap');
 
 JsMacros.assertEvent(event, 'Service');
 
-const config = Config.readConfig('./config/eastarctica.json', {
-    enabled: false,
-    range: 4.5,
-    fov: 360,
-    throughWalls: false,
-    attackDelay: 0,
-    autoSwitch: false,
-    targetMode: 'Closest',
-}, 'killaura');
+const config = Config.readConfig(
+    './config/eastarctica.json',
+    {
+        enabled: false,
+        range: 4.5,
+        fov: 360,
+        throughWalls: false,
+        attackDelay: 0,
+        autoSwitch: false,
+        targetMode: 'Closest',
+    },
+    'killaura'
+);
 
 const wrapper = new CommandBuilderWrapper('killaura')
     .processCommands([
@@ -24,7 +29,8 @@ const wrapper = new CommandBuilderWrapper('killaura')
                 config.enabled = !config.enabled;
                 Chat.log(`Killaura ${config.enabled ? 'enabled' : 'disabled'}.`);
             },
-        }, {
+        },
+        {
             literalArg: 'set',
             children: [
                 {
@@ -82,28 +88,31 @@ const wrapper = new CommandBuilderWrapper('killaura')
                     },
                 },
             ],
-        }
+        },
     ])
     .register();
 
-const tickListener = JsMacros.on('Tick', JavaWrapper.methodToJava(() => {
-    if (!config.enabled) return;
+const tickListener = JsMacros.on(
+    'Tick',
+    JavaWrapper.methodToJava(() => {
+        if (!config.enabled) return;
 
-    // get nearby enemies
-    const allEntities = World.getEntities()
-        .toArray()
-        .filter(entity => {
-            return entity.getType() === "minecraft:phantom";
-        });
-    
-    for (const entity of allEntities) {
-        // TODO: Calculate from eyes
-        if (entity.distanceTo(Player.getPlayer()) <= config.range) {
-            // Attack the entity
-            Player.interactions().attack(entity)
+        // get nearby enemies
+        const allEntities = World.getEntities()
+            .toArray()
+            .filter((entity) => {
+                return entity.getType() === 'minecraft:phantom';
+            });
+
+        for (const entity of allEntities) {
+            // TODO: Calculate from eyes
+            if (entity.distanceTo(Player.getPlayer()) <= config.range) {
+                // Attack the entity
+                Player.interactions().attack(entity);
+            }
         }
-    }
-}));
+    })
+);
 
 event.stopListener = JavaWrapper.methodToJava((_) => {
     wrapper.unregister();

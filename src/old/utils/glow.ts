@@ -4,7 +4,7 @@ Chat.log(RenderQueue);
 
 const DISCARDED = Java.type('net.minecraft.class_1297').class_5529.field_26999; // Entity.RemovalReason.DISCARDED
 
-export function glowBlock(x: number, y: number, z: number, color: number = 0xFFFFFF) {
+export function glowBlock(x: number, y: number, z: number, color: number = 0xffffff) {
     const world = Client.getMinecraft().field_1687;
     x = Math.floor(x);
     y = Math.floor(y);
@@ -20,7 +20,7 @@ export function glowBlock(x: number, y: number, z: number, color: number = 0xFFF
     if (shapes.length == 0) {
         shapes.push(new Box(rawBlockPos));
     } else {
-        shapes = shapes.map(shape => shape.method_60314(blockPos.toPos3D().toVector().toMojangFloatVector())); // Box.offset
+        shapes = shapes.map((shape) => shape.method_60314(blockPos.toPos3D().toVector().toMojangFloatVector())); // Box.offset
     }
 
     for (const cubiod of shapes) {
@@ -30,5 +30,5 @@ export function glowBlock(x: number, y: number, z: number, color: number = 0xFFF
 
     return () => {
         return true;
-    }
+    };
 }

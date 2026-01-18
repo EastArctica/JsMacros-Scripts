@@ -30,7 +30,7 @@ function initImGui() {
     const fontAtlas = io.getFonts();
     const fontConfig = new ImFontConfig();
 
-    fontConfig.setGlyphRanges(fontAtlas.getGlyphRangesDefault())
+    fontConfig.setGlyphRanges(fontAtlas.getGlyphRangesDefault());
     fontAtlas.addFontDefault(fontConfig);
 
     fontConfig.setMergeMode(true);
@@ -72,7 +72,7 @@ function onFrameRender() {
 }
 
 // Get window handle
-Client.runOnMainThread(JavaWrapper.methodToJava(() => onGlfwInit(mcHandle)))
+Client.runOnMainThread(JavaWrapper.methodToJava(() => onGlfwInit(mcHandle)));
 
 // const draw3d = Reflection.createClassProxyBuilder(Java.type('xyz.wagyourtail.jsmacros.client.api.classes.render.Draw3D') as any)
 //             .addMethod('render', JavaWrapper.methodToJava((ref: any, args) => {
@@ -84,16 +84,17 @@ Client.runOnMainThread(JavaWrapper.methodToJava(() => onGlfwInit(mcHandle)))
 
 Chat.log('ImGui loaded!');
 
-
 GlobalVars.putObject('imgui-on-frame-render', JavaWrapper.methodToJava(onFrameRender));
 
-Java.addToClasspath("byte-buddy-agent-1.15.11.jar")
-const instrumentation = (Java.type("net.bytebuddy.agent.ByteBuddyAgent") as any).install()
-const ctClass = Java.type("javassist.ClassPool").getDefault().get("com.mojang.blaze3d.systems.RenderSystem")
-ctClass.stopPruning(true)
-if (ctClass.isFrozen()) ctClass.defrost()
-const ctMethod = ctClass.getDeclaredMethod("flipFrame").setBody(`{ pollEvents(); }`)
-instrumentation.redefineClasses(new (java.lang as any).instrument.ClassDefinition(Reflection.getClass(ctClass.getName()), ctClass.toBytecode()))
+Java.addToClasspath('byte-buddy-agent-1.15.11.jar');
+const instrumentation = (Java.type('net.bytebuddy.agent.ByteBuddyAgent') as any).install();
+const ctClass = Java.type('javassist.ClassPool').getDefault().get('com.mojang.blaze3d.systems.RenderSystem');
+ctClass.stopPruning(true);
+if (ctClass.isFrozen()) ctClass.defrost();
+const ctMethod = ctClass.getDeclaredMethod('flipFrame').setBody(`{ pollEvents(); }`);
+instrumentation.redefineClasses(
+    new (java.lang as any).instrument.ClassDefinition(Reflection.getClass(ctClass.getName()), ctClass.toBytecode())
+);
 
 // Java.addToClasspath("byte-buddy-agent-1.15.11.jar")
 // const instrumentation = Java.type("net.bytebuddy.agent.ByteBuddyAgent").install()
@@ -102,5 +103,3 @@ instrumentation.redefineClasses(new (java.lang as any).instrument.ClassDefinitio
 // if (ctClass.isFrozen()) ctClass.defrost()
 // ctClass.getDeclaredMethod("method_46529").setBody(`{ return true; }`)
 // instrumentation.redefineClasses(new java.lang.instrument.ClassDefinition(Reflection.getClass(ctClass.getName()), ctClass.toBytecode()))
-
-

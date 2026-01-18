@@ -2,8 +2,8 @@ JsMacros.assertEvent(event, 'Service');
 
 enum CaptchaType {
     NAME = 'NAME',
-    TEXTURE = 'TEXTURE'
-};
+    TEXTURE = 'TEXTURE',
+}
 
 let waiting = false;
 function handleCaptcha(inventory: Inventory<any>) {
@@ -42,17 +42,14 @@ function handleCaptcha(inventory: Inventory<any>) {
         if (!item) continue;
         if (item.getName().toString().includes('AFK Captcha')) continue;
 
-        if (item.getDefaultName() == captchaItem.getDefaultName()
-            && item !== captchaItem) {
+        if (item.getDefaultName() == captchaItem.getDefaultName() && item !== captchaItem) {
             // Chat.log('Found captcha item by name: ' + item.getName());
             let slot = inventory.findItem(item);
             inventory.click(slot[0]);
             break;
         }
 
-        if (captchaType == CaptchaType.TEXTURE
-            && item.getItemId() == captchaItem.getItemId()
-            && item !== captchaItem) {
+        if (captchaType == CaptchaType.TEXTURE && item.getItemId() == captchaItem.getItemId() && item !== captchaItem) {
             // Chat.log('Found captcha item by texture: ' + item.getName());
             let slot = inventory.findItem(item);
             inventory.click(slot[0]);
@@ -61,10 +58,13 @@ function handleCaptcha(inventory: Inventory<any>) {
     }
 }
 
-JsMacros.on('Tick', JavaWrapper.methodToJava((tickEvent) => {
-    let player = Player.getPlayer(); 
-    if (!player) return;
-    if (!Hud.isContainer()) return;
-    
-    handleCaptcha(Player.openInventory());
-}));
+JsMacros.on(
+    'Tick',
+    JavaWrapper.methodToJava((tickEvent) => {
+        let player = Player.getPlayer();
+        if (!player) return;
+        if (!Hud.isContainer()) return;
+
+        handleCaptcha(Player.openInventory());
+    })
+);

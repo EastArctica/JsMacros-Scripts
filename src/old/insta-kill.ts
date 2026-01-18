@@ -8,16 +8,22 @@ const MAX_REACH = 5; // 31 blocks
 
 function getEntityBounds() {
     let bounds = [];
-    World.getEntities().forEach(JavaWrapper.methodToJava((entity) => {
-        // Get the size of the entity and determine the blocks it occupies
-        const boundingBox = entity.getRaw().method_5829();
-        bounds.push(boundingBox);
-    }));
+    World.getEntities().forEach(
+        JavaWrapper.methodToJava((entity) => {
+            // Get the size of the entity and determine the blocks it occupies
+            const boundingBox = entity.getRaw().method_5829();
+            bounds.push(boundingBox);
+        })
+    );
 
     return bounds;
 }
 
-function findChestLocation(maxDistance: number = Player.getReach(), matchEnderChest: boolean = false, nearPos: BlockPosHelper = null) {
+function findChestLocation(
+    maxDistance: number = Player.getReach(),
+    matchEnderChest: boolean = false,
+    nearPos: BlockPosHelper = null
+) {
     const player = Player.getPlayer();
     const blacklistBoxes = getEntityBounds();
 
@@ -31,18 +37,68 @@ function findChestLocation(maxDistance: number = Player.getReach(), matchEnderCh
     if (nearPos) {
         let dist = 0;
         while (!foundBlock && dist < maxDistance) {
-            World.iterateSphere(nearPos, dist, false, JavaWrapper.methodToJava((blockData) => {
+            World.iterateSphere(
+                nearPos,
+                dist,
+                false,
+                JavaWrapper.methodToJava((blockData) => {
+                    if (foundBlock) return;
+
+                    // If this position was already checked, skip it
+                    let distance = blockData.getBlockPos().distanceTo(nearPos);
+                    if (distance > dist - 1) return;
+
+                    let aboveBlock = World.getBlock(blockData.getBlockPos().up(1));
+                    if (
+                        matchEnderChest &&
+                        blockData.getId() == 'minecraft:ender_chest' &&
+                        aboveBlock.getId() == 'minecraft:air'
+                    ) {
+                        foundBlock = true;
+                        existingEnderChest = true;
+
+                        let pos = blockData.getBlockPos();
+                        targetBlockX = pos.getX();
+                        targetBlockY = pos.getY();
+                        targetBlockZ = pos.getZ();
+                        return;
+                    }
+
+                    if (blockData.getId() == 'minecraft:air' && aboveBlock.getId() == 'minecraft:air') {
+                        const blockBox = new Box(blockData.getBlockPos().getRaw());
+                        if (blacklistBoxes.some((box) => box.method_994(blockBox))) {
+                            // boolean Box.intersects( Box box)
+                            return;
+                        }
+
+                        let pos = blockData.getBlockPos();
+                        targetBlockX = pos.getX();
+                        targetBlockY = pos.getY();
+                        targetBlockZ = pos.getZ();
+                        foundBlock = true;
+                        return;
+                    }
+                })
+            );
+            dist += 1;
+        }
+    } else {
+        World.iterateSphere(
+            player.getBlockPos(),
+            Math.floor(MAX_REACH),
+            false,
+            JavaWrapper.methodToJava((blockData) => {
                 if (foundBlock) return;
-                
-                // If this position was already checked, skip it
-                let distance = blockData.getBlockPos().distanceTo(nearPos);
-                if (distance > (dist - 1)) return;
 
                 let aboveBlock = World.getBlock(blockData.getBlockPos().up(1));
-                if (matchEnderChest && blockData.getId() == 'minecraft:ender_chest' && aboveBlock.getId() == 'minecraft:air') {
+                if (
+                    matchEnderChest &&
+                    blockData.getId() == 'minecraft:ender_chest' &&
+                    aboveBlock.getId() == 'minecraft:air'
+                ) {
                     foundBlock = true;
                     existingEnderChest = true;
-            
+
                     let pos = blockData.getBlockPos();
                     targetBlockX = pos.getX();
                     targetBlockY = pos.getY();
@@ -52,10 +108,11 @@ function findChestLocation(maxDistance: number = Player.getReach(), matchEnderCh
 
                 if (blockData.getId() == 'minecraft:air' && aboveBlock.getId() == 'minecraft:air') {
                     const blockBox = new Box(blockData.getBlockPos().getRaw());
-                    if (blacklistBoxes.some((box) => box.method_994(blockBox))) { // boolean Box.intersects( Box box)   
+                    if (blacklistBoxes.some((box) => box.method_994(blockBox))) {
+                        // boolean Box.intersects( Box box)
                         return;
                     }
-            
+
                     let pos = blockData.getBlockPos();
                     targetBlockX = pos.getX();
                     targetBlockY = pos.getY();
@@ -63,41 +120,10 @@ function findChestLocation(maxDistance: number = Player.getReach(), matchEnderCh
                     foundBlock = true;
                     return;
                 }
-            }));
-            dist += 1;
-        }
-    } else {
-        World.iterateSphere(player.getBlockPos(), Math.floor(MAX_REACH), false, JavaWrapper.methodToJava((blockData) => {
-            if (foundBlock) return;
-        
-            let aboveBlock = World.getBlock(blockData.getBlockPos().up(1));
-            if (matchEnderChest && blockData.getId() == 'minecraft:ender_chest' && aboveBlock.getId() == 'minecraft:air') {
-                foundBlock = true;
-                existingEnderChest = true;
-        
-                let pos = blockData.getBlockPos();
-                targetBlockX = pos.getX();
-                targetBlockY = pos.getY();
-                targetBlockZ = pos.getZ();
+
                 return;
-            }
-        
-            if (blockData.getId() == 'minecraft:air' && aboveBlock.getId() == 'minecraft:air') {
-                const blockBox = new Box(blockData.getBlockPos().getRaw());
-                if (blacklistBoxes.some((box) => box.method_994(blockBox))) { // boolean Box.intersects( Box box)   
-                    return;
-                }
-        
-                let pos = blockData.getBlockPos();
-                targetBlockX = pos.getX();
-                targetBlockY = pos.getY();
-                targetBlockZ = pos.getZ();
-                foundBlock = true;
-                return;
-            }
-        
-            return;
-        }));
+            })
+        );
     }
 
     if (!foundBlock) {
@@ -106,11 +132,14 @@ function findChestLocation(maxDistance: number = Player.getReach(), matchEnderCh
 
     return {
         pos: new BlockPosHelper(targetBlockX, targetBlockY, targetBlockZ),
-        existingEnderChest: existingEnderChest
+        existingEnderChest: existingEnderChest,
     };
 }
 
-function findCrystalLocation(nearPos: BlockPosHelper = null, allowedBlocks: Array<string> = ['minecraft:obsidian', 'minecraft:air']): BlockPosHelper {
+function findCrystalLocation(
+    nearPos: BlockPosHelper = null,
+    allowedBlocks: Array<string> = ['minecraft:obsidian', 'minecraft:air']
+): BlockPosHelper {
     const MAX_DISTANCE = 5;
     const blacklistBoxes = getEntityBounds();
 
@@ -122,32 +151,38 @@ function findCrystalLocation(nearPos: BlockPosHelper = null, allowedBlocks: Arra
     // If we're given a position, use that as the center and search around it, slowly expanding outwards
     let dist = 0;
     while (!foundBlock && dist < MAX_DISTANCE) {
-        World.iterateBox(nearPos.down(1).east(dist).south(dist), nearPos.down(1).west(dist).north(dist), false, JavaWrapper.methodToJava((blockData) => {
-            if (foundBlock) return;
-            
-            // TODO: Prefer obsidian that already exists
-            // TODO: Determine what block we can break the fastest
-            
-            // Skip already checked blocks
-            let distance = blockData.getBlockPos().distanceTo(nearPos);
-            if (distance > (dist - 1)) return;
+        World.iterateBox(
+            nearPos.down(1).east(dist).south(dist),
+            nearPos.down(1).west(dist).north(dist),
+            false,
+            JavaWrapper.methodToJava((blockData) => {
+                if (foundBlock) return;
 
-            let aboveBlock = World.getBlock(blockData.getBlockPos().up(1));
+                // TODO: Prefer obsidian that already exists
+                // TODO: Determine what block we can break the fastest
 
-            if (allowedBlocks.includes(blockData.getId()) && aboveBlock.getId() == 'minecraft:air') {
-                const blockBox = new Box(blockData.getBlockPos().getRaw()).method_1009(0, 2, 0);
-                if (blacklistBoxes.some((box) => box.method_994(blockBox))) { // boolean Box.intersects( Box box)   
+                // Skip already checked blocks
+                let distance = blockData.getBlockPos().distanceTo(nearPos);
+                if (distance > dist - 1) return;
+
+                let aboveBlock = World.getBlock(blockData.getBlockPos().up(1));
+
+                if (allowedBlocks.includes(blockData.getId()) && aboveBlock.getId() == 'minecraft:air') {
+                    const blockBox = new Box(blockData.getBlockPos().getRaw()).method_1009(0, 2, 0);
+                    if (blacklistBoxes.some((box) => box.method_994(blockBox))) {
+                        // boolean Box.intersects( Box box)
+                        return;
+                    }
+
+                    let pos = blockData.getBlockPos();
+                    targetBlockX = pos.getX();
+                    targetBlockY = pos.getY();
+                    targetBlockZ = pos.getZ();
+                    foundBlock = true;
                     return;
                 }
-        
-                let pos = blockData.getBlockPos();
-                targetBlockX = pos.getX();
-                targetBlockY = pos.getY();
-                targetBlockZ = pos.getZ();
-                foundBlock = true;
-                return;
-            }
-        }));
+            })
+        );
         dist += 1;
     }
 
@@ -156,7 +191,7 @@ function findCrystalLocation(nearPos: BlockPosHelper = null, allowedBlocks: Arra
             return null;
         }
 
-        return findCrystalLocation(nearPos, [ 'minecraft:stone' ]);
+        return findCrystalLocation(nearPos, ['minecraft:stone']);
     }
 
     return new BlockPosHelper(targetBlockX, targetBlockY, targetBlockZ);
@@ -174,7 +209,7 @@ function getTargetPlayer(): PlayerEntityHelper | null {
 
         // Ensure they are within reach
         const distance = player.getBlockPos().distanceTo(entity.getPos());
-        if (distance > MAX_REACH) continue
+        if (distance > MAX_REACH) continue;
 
         // Calculate angle to each player
         const angle = Math.atan2(entity.getX() - player.getX(), entity.getZ() - player.getZ());
@@ -194,17 +229,27 @@ function main() {
     const interactionManger = Player.getInteractionManager();
     const targetPlayer = getTargetPlayer();
 
-    Chat.log(`player: ${player} ${targetPlayer}`)
+    Chat.log(`player: ${player} ${targetPlayer}`);
     if (!player || !targetPlayer) return;
     Chat.log(`[insta-kill] Target: ${targetPlayer.getName().toString()}`);
 
     // Break the block under us until we're 1 block below the target and teleport into it
     for (let i = 0; i < targetPlayer.getBlockPos().getY() - player.getBlockPos().getY() + 1; i++) {
-        inv().swapHotbar(inv().findItem('minecraft:netherite_pickaxe')[0], inv().getSelectedHotbarSlotIndex() as HotbarSwapSlot);
-        interactionManger.breakBlock(player.getBlockPos().getX(), player.getBlockPos().getY() - i - 1, player.getBlockPos().getZ());
+        inv().swapHotbar(
+            inv().findItem('minecraft:netherite_pickaxe')[0],
+            inv().getSelectedHotbarSlotIndex() as HotbarSwapSlot
+        );
+        interactionManger.breakBlock(
+            player.getBlockPos().getX(),
+            player.getBlockPos().getY() - i - 1,
+            player.getBlockPos().getZ()
+        );
     }
 
-    let pos = player.getBlockPos().toPos3D().add(0.5, targetPlayer.getBlockPos().getY() - player.getBlockPos().getY() - 1, 0.5);
+    let pos = player
+        .getBlockPos()
+        .toPos3D()
+        .add(0.5, targetPlayer.getBlockPos().getY() - player.getBlockPos().getY() - 1, 0.5);
     player.setPos(pos);
 
     // Find ender chest
@@ -224,14 +269,24 @@ function main() {
     // Place ender chest
     if (!existingEnderChest) {
         Chat.log('[insta-kill] Placing ender chest');
-        interactionManger.interactBlock(enderChestPos.getX(), enderChestPos.getY(), enderChestPos.getZ(), "up", false);
+        interactionManger.interactBlock(enderChestPos.getX(), enderChestPos.getY(), enderChestPos.getZ(), 'up', false);
     }
 
     // Open ender chest
-    JsMacros.waitForEvent('ContainerUpdate', JavaWrapper.methodToJava((e) => true), JavaWrapper.methodToJava((str: any, o1: any) => {
-        interactionManger.interactBlock(enderChestPos.getX(), enderChestPos.getY(), enderChestPos.getZ(), "up", false);
-        return null;
-    }));
+    JsMacros.waitForEvent(
+        'ContainerUpdate',
+        JavaWrapper.methodToJava((e) => true),
+        JavaWrapper.methodToJava((str: any, o1: any) => {
+            interactionManger.interactBlock(
+                enderChestPos.getX(),
+                enderChestPos.getY(),
+                enderChestPos.getZ(),
+                'up',
+                false
+            );
+            return null;
+        })
+    );
     Chat.log('[insta-kill] Ender chest opened');
     const enderChestSlots = inv().getMap().container;
 
@@ -240,7 +295,12 @@ function main() {
         const slot = inv().getSlot(slotId);
         if (slot.getItemId().match(/minecraft:[a-z]*_?shulker_box/g) == null) continue;
 
-        if (slot.getName().toString().match(/.*Toys.*/g)) {
+        if (
+            slot
+                .getName()
+                .toString()
+                .match(/.*Toys.*/g)
+        ) {
             inv().swapHotbar(slotId, inv().getSelectedHotbarSlotIndex() as HotbarSwapSlot);
             break;
         }
@@ -252,10 +312,20 @@ function main() {
     // Place shulker
     interactionManger.interactBlock(shulkerTarget.getX(), shulkerTarget.getY(), shulkerTarget.getZ(), 'up', false);
 
-    JsMacros.waitForEvent('ContainerUpdate', JavaWrapper.methodToJava((e) => true), JavaWrapper.methodToJava((str: any, o1: any) => {
-        interactionManger.interactBlock(shulkerTarget.getX(), shulkerTarget.getY(), shulkerTarget.getZ(), 'up', false);
-        return null;
-    }));
+    JsMacros.waitForEvent(
+        'ContainerUpdate',
+        JavaWrapper.methodToJava((e) => true),
+        JavaWrapper.methodToJava((str: any, o1: any) => {
+            interactionManger.interactBlock(
+                shulkerTarget.getX(),
+                shulkerTarget.getY(),
+                shulkerTarget.getZ(),
+                'up',
+                false
+            );
+            return null;
+        })
+    );
     Chat.log('[insta-kill] Shulker placed');
 
     // Take all items
@@ -266,7 +336,7 @@ function main() {
     inv().close();
 
     let pot: number;
-    while (pot = inv().findItem('minecraft:splash_potion')[0]) {
+    while ((pot = inv().findItem('minecraft:splash_potion')[0])) {
         inv().swapHotbar(pot, inv().getSelectedHotbarSlotIndex() as HotbarSwapSlot);
         player.lookAt('down');
         interactionManger.interactItem(false);
@@ -286,7 +356,10 @@ function main() {
         const targetBlock = World.getBlock(crystalPos);
         if (targetBlock.getId() !== 'minecraft:obsidian') {
             if (targetBlock.getId() !== 'minecraft:air') {
-                inv().swapHotbar(inv().findItem('minecraft:netherite_pickaxe')[0], inv().getSelectedHotbarSlotIndex() as HotbarSwapSlot);
+                inv().swapHotbar(
+                    inv().findItem('minecraft:netherite_pickaxe')[0],
+                    inv().getSelectedHotbarSlotIndex() as HotbarSwapSlot
+                );
                 interactionManger.breakBlock(crystalPos.getX(), crystalPos.getY(), crystalPos.getZ());
                 Client.waitTick(2);
             }
@@ -306,7 +379,9 @@ function main() {
         Client.waitTick(1);
 
         // explode the crystal
-        const crystal = World.getEntities().find((entity) => entity.getType() === 'minecraft:end_crystal' && entity.getBlockPos().distanceTo(crystalPos) < 2);
+        const crystal = World.getEntities().find(
+            (entity) => entity.getType() === 'minecraft:end_crystal' && entity.getBlockPos().distanceTo(crystalPos) < 2
+        );
         if (crystal) {
             interactionManger.attack(crystal);
         }

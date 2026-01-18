@@ -17,34 +17,40 @@ function openShop() {
 }
 
 function filterSlots(slots: number[], predicate: (item: ItemStackHelper) => boolean): number[] {
-    return slots.filter(slot => {
+    return slots.filter((slot) => {
         const item = inv().getSlot(slot);
         return predicate(item);
     });
 }
 
 function clickSlotWithName(name: string, diffIndex = 0) {
-    const slot = filterSlots(inv().getMap().container, item => item.getName().getString() == name)[0];
+    const slot = filterSlots(inv().getMap().container, (item) => item.getName().getString() == name)[0];
     if (!slot) {
-        const msg = `§4No "${name}" slot found, are we out of sync with the shop?\nFound Items:\n` +
-            filterSlots(inv().getMap().container, _ => true)
-                .map(slot => inv().getSlot(slot).getName().getString())
-                .join('\n  - ') + `\nContainer name: ${inv().getContainerTitle()}`;
+        const msg =
+            `§4No "${name}" slot found, are we out of sync with the shop?\nFound Items:\n` +
+            filterSlots(inv().getMap().container, (_) => true)
+                .map((slot) => inv().getSlot(slot).getName().getString())
+                .join('\n  - ') +
+            `\nContainer name: ${inv().getContainerTitle()}`;
         Chat.log(msg);
         throw new Error(msg);
     }
 
     // Wait for inventory update
-    JsMacros.waitForEvent('SlotUpdate', JavaWrapper.methodToJava((e) => true), JavaWrapper.methodToJava((u1, u2) => {
-        inv().click(slot + diffIndex);
-        return null;
-    }));
+    JsMacros.waitForEvent(
+        'SlotUpdate',
+        JavaWrapper.methodToJava((e) => true),
+        JavaWrapper.methodToJava((u1, u2) => {
+            inv().click(slot + diffIndex);
+            return null;
+        })
+    );
     // Seems to need a slight delay
     Client.waitTick(3);
 }
 
 function purchaseGear() {
-    openShop()
+    openShop();
     Client.waitTick(5);
     clickSlotWithName('GEAR SHOP');
 
@@ -105,9 +111,9 @@ function purchaseGear() {
     for (let i = 0; i < 6; i++) {
         clickSlotWithName('CONFIRM');
     }
-    
+
     clickSlotWithName('CANCEL');
-    clickSlotWithName('Bottle o\' Enchanting');
+    clickSlotWithName("Bottle o' Enchanting");
     clickSlotWithName('ADD 64');
     clickSlotWithName('CONFIRM');
 
@@ -124,9 +130,9 @@ function purchaseGear() {
     for (let i = 0; i < 6; i++) {
         clickSlotWithName('CONFIRM');
     }
-    
+
     clickSlotWithName('CANCEL');
-    clickSlotWithName('Bottle o\' Enchanting');
+    clickSlotWithName("Bottle o' Enchanting");
     clickSlotWithName('ADD 64');
     clickSlotWithName('CONFIRM');
 
@@ -137,12 +143,12 @@ function purchaseGear() {
     for (let i = 0; i < 2; i++) {
         clickSlotWithName('CONFIRM');
     }
-    
+
     clickSlotWithName('CANCEL');
     clickSlotWithName('Obsidian');
     clickSlotWithName('ADD 64');
     clickSlotWithName('CONFIRM');
-    
+
     clickSlotWithName('CANCEL');
     clickSlotWithName('End Crystal');
     clickSlotWithName('ADD 64');
@@ -153,9 +159,9 @@ function purchaseGear() {
     for (let i = 0; i < 4; i++) {
         clickSlotWithName('CONFIRM');
     }
-    
+
     clickSlotWithName('CANCEL');
-    clickSlotWithName('Bottle o\' Enchanting');
+    clickSlotWithName("Bottle o' Enchanting");
     clickSlotWithName('ADD 64');
     clickSlotWithName('CONFIRM');
 
@@ -235,7 +241,7 @@ function run() {
     inv().setSelectedHotbarSlotIndex(0);
     Player.getInteractionManager().interact();
     // Start sneaking now
-    KeyBind.keyBind("key.sneak", true);
+    KeyBind.keyBind('key.sneak', true);
     Client.waitTick(2);
 
     // Place second shulker box
@@ -244,28 +250,30 @@ function run() {
     Client.waitTick(3);
 
     // Stop sneaking
-    KeyBind.keyBind("key.sneak", false);
+    KeyBind.keyBind('key.sneak', false);
     Client.waitTick(3);
 }
 
 const command = new CommandBuilderWrapper('auto-shulker');
-command.processCommands([{
-    longArg: 'quantity',
-    executesAsync: async (ctx) => {
-        const quantity: number = ctx.getArg('quantity');
-        Chat.log(`Running auto shulker with quantity: ${quantity}`);
+command.processCommands([
+    {
+        longArg: 'quantity',
+        executesAsync: async (ctx) => {
+            const quantity: number = ctx.getArg('quantity');
+            Chat.log(`Running auto shulker with quantity: ${quantity}`);
 
-        try {
-            for (let i = 0; i < quantity; i++) {
-                run();
-                Client.waitTick(10);
-                Chat.log(`Completed run ${i + 1} successfully.`);
+            try {
+                for (let i = 0; i < quantity; i++) {
+                    run();
+                    Client.waitTick(10);
+                    Chat.log(`Completed run ${i + 1} successfully.`);
+                }
+            } catch (e) {
+                Chat.log(`§4Failed to run auto shulker: ${e}`);
             }
-        } catch (e) {
-            Chat.log(`§4Failed to run auto shulker: ${e}`);
-        }
-    }
-}]);
+        },
+    },
+]);
 command.register();
 
 event.stopListener = JavaWrapper.methodToJava((_) => {

@@ -6,11 +6,13 @@ const CommandManager = Chat.getCommandManager();
 
 CommandManager.unregisterCommand('kille');
 const builder = CommandManager.createCommandBuilder('kille')
-                              .identifierArg('type')
-                              .suggestIdentifier([...new Set(World.getEntities().map(e => e.getType().toString()))])
-                              .executes(JavaWrapper.methodToJava((a) => {
-                                Chat.say(`/kill @e[type=${a.getArg('type')}]`);
-                              }));
+    .identifierArg('type')
+    .suggestIdentifier([...new Set(World.getEntities().map((e) => e.getType().toString()))])
+    .executes(
+        JavaWrapper.methodToJava((a) => {
+            Chat.say(`/kill @e[type=${a.getArg('type')}]`);
+        })
+    );
 builder.register();
 
 event.stopListener = JavaWrapper.methodToJava(() => {

@@ -3,13 +3,13 @@ export function interpolateColor(from: number, to: number, ratio: number): numbe
     ratio = Math.max(0, Math.min(1, ratio));
 
     // Extract RGB components from the colors
-    const r1 = (from >> 16) & 0xFF;
-    const g1 = (from >> 8) & 0xFF;
-    const b1 = from & 0xFF;
+    const r1 = (from >> 16) & 0xff;
+    const g1 = (from >> 8) & 0xff;
+    const b1 = from & 0xff;
 
-    const r2 = (to >> 16) & 0xFF;
-    const g2 = (to >> 8) & 0xFF;
-    const b2 = to & 0xFF;
+    const r2 = (to >> 16) & 0xff;
+    const g2 = (to >> 8) & 0xff;
+    const b2 = to & 0xff;
 
     // Interpolate each color component
     const r = Math.round(r1 + (r2 - r1) * ratio);

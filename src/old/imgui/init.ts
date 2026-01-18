@@ -1,4 +1,3 @@
-
 // Download latest imgui jar from imgui-java releases
 const IMGUI_JAVA_VERSION = 'v1.88.0';
 
@@ -6,7 +5,9 @@ const IMGUI_JAVA_VERSION = 'v1.88.0';
 const OS_NATIVE_NAME = 'imgui-java64.dll';
 
 function extractNativeLibraries() {
-    const res = Request.get(`https://github.com/SpaiR/imgui-java/releases/download/${IMGUI_JAVA_VERSION}/native-libraries.zip`);
+    const res = Request.get(
+        `https://github.com/SpaiR/imgui-java/releases/download/${IMGUI_JAVA_VERSION}/native-libraries.zip`
+    );
     const data = res.byteArray();
 
     // Un-Zip the downloaded file
@@ -40,7 +41,9 @@ function extractNativeLibraries() {
 }
 
 function extractJavaLibraries() {
-    const res = Request.get(`https://github.com/SpaiR/imgui-java/releases/download/${IMGUI_JAVA_VERSION}/java-libraries.zip`);
+    const res = Request.get(
+        `https://github.com/SpaiR/imgui-java/releases/download/${IMGUI_JAVA_VERSION}/java-libraries.zip`
+    );
     const data = res.byteArray();
 
     // Un-Zip the downloaded file
@@ -71,13 +74,12 @@ function extractJavaLibraries() {
     }
 }
 
-
 if (!FS.exists('./libraries')) {
     Chat.log('Downloading imgui-java libraries...');
     extractNativeLibraries();
     Chat.log('Extracted native libraries');
     extractJavaLibraries();
-    Chat.log('Extracted java libraries');    
+    Chat.log('Extracted java libraries');
 }
 
 // TODO: Check if the native library is already loaded
@@ -90,7 +92,10 @@ const javaLibs = FS.list('./libraries/java/');
 const loadedLibraries = {};
 for (const lib of javaLibs) {
     const URLClassLoader = Java.type('java.net.URLClassLoader') as any;
-    const child = new URLClassLoader([FS.toRawFile(`./libraries/java/${lib}`).toURI().toURL()], (Java.type('java.lang.Class') as any).classLoader);
+    const child = new URLClassLoader(
+        [FS.toRawFile(`./libraries/java/${lib}`).toURI().toURL()],
+        (Java.type('java.lang.Class') as any).classLoader
+    );
     loadedLibraries[lib] = child;
 }
 Chat.log('Loaded java libraries');

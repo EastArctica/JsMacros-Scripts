@@ -9,12 +9,15 @@ const InventoryUtils = Java.type('fi.dy.masa.malilib.util.InventoryUtils') as {
     preRestockHand(player: any, hand: typeof Hand, threshold: number, allowHotbar: boolean): void;
 };
 
-JsMacros.on('Tick', JavaWrapper.methodToJava((evt, ctx) => {
-    ctx.releaseLock();
-    const interactionManager = Player.getInteractionManager();
-    if (!interactionManager || !World.isWorldLoaded()) return;
+JsMacros.on(
+    'Tick',
+    JavaWrapper.methodToJava((evt, ctx) => {
+        ctx.releaseLock();
+        const interactionManager = Player.getInteractionManager();
+        if (!interactionManager || !World.isWorldLoaded()) return;
 
-    InventoryUtils.preRestockHand(Player.getPlayer().getRaw(), OFF_HAND, 48, true);
-}));
+        InventoryUtils.preRestockHand(Player.getPlayer().getRaw(), OFF_HAND, 48, true);
+    })
+);
 
 export default event;

@@ -4,19 +4,19 @@ const BlockPosHelper = Packages.xyz.wagyourtail.jsmacros.client.api.helpers.worl
 type Command = {
     literalArg?: string;
     booleanArg?: string;
-    intArg?: string | { name: string, min: int, max: int };
+    intArg?: string | { name: string; min: int; max: int };
     intRangeArg?: string;
-    longArg?: string | { name: string, min: long, max: long };
+    longArg?: string | { name: string; min: long; max: long };
     floatRangeArg?: string;
-    doubleArg?: string | { name: string, min: double, max: double };
+    doubleArg?: string | { name: string; min: double; max: double };
     uuidArgType?: string;
     greedyStringArg?: string;
     quotedStringArg?: string;
     wordArg?: string;
     regexArgType?: {
-        name: string,
-        regex: string,
-        flags: string
+        name: string;
+        regex: string;
+        flags: string;
     };
     textArgType?: string;
     timeArg?: string;

@@ -1,9 +1,5 @@
-const cauldronScanner = World.getWorldScanner()
-                          .withStringBlockFilter().contains('cauldron')
-                          .build()
-const waterScanner = World.getWorldScanner()
-                          .withStringBlockFilter().contains('water')
-                          .build()
+const cauldronScanner = World.getWorldScanner().withStringBlockFilter().contains('cauldron').build();
+const waterScanner = World.getWorldScanner().withStringBlockFilter().contains('water').build();
 
 function dupe() {
     const inventory = Player.openInventory();
@@ -11,7 +7,8 @@ function dupe() {
     const bucketSlot = inventory.findItem('minecraft:water_bucket')?.[0] || inventory.findItem('minecraft:bucket')?.[0];
     // Chat.log(bucketSlot);
 
-    const hotbarBucketSlot = (bucketSlot < 36 || bucketSlot > 44) ? inventory.findFreeHotbarSlot() - 36 || 0 : bucketSlot - 36;
+    const hotbarBucketSlot =
+        bucketSlot < 36 || bucketSlot > 44 ? inventory.findFreeHotbarSlot() - 36 || 0 : bucketSlot - 36;
     // Move if item is not in hotbar
     if (bucketSlot < 36 || bucketSlot > 44) {
         inventory.swapHotbar(bucketSlot, hotbarBucketSlot);
@@ -19,7 +16,11 @@ function dupe() {
 
     // Ensure player is holding shulkers to be duped
     let heldItem = inventory.getSlot(36 + inventory.getSelectedHotbarSlotIndex());
-    if (!heldItem.getItemID().includes('shulker_box') || heldItem.getItemID() == 'minecraft:shulker_box' || heldItem.getCount() == 1) {
+    if (
+        !heldItem.getItemID().includes('shulker_box') ||
+        heldItem.getItemID() == 'minecraft:shulker_box' ||
+        heldItem.getCount() == 1
+    ) {
         Chat.log('You must be holding 2 or more dyed shulkers to dupe');
         return;
     }
@@ -65,6 +66,4 @@ function dupe() {
     }
 }
 
-for (let i = 0; i < 10 ; i++)
-    dupe();
-
+for (let i = 0; i < 10; i++) dupe();

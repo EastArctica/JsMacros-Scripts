@@ -1,23 +1,27 @@
 JsMacros.assertEvent(event, 'Service');
-if (!World.isWorldLoaded()) JsMacros.waitForEvent('ChunkLoad')
+if (!World.isWorldLoaded()) JsMacros.waitForEvent('ChunkLoad');
 
 const CommandManager = Chat.getCommandManager();
 CommandManager.unregisterCommand('beacon-utils');
 
 const builder = CommandManager.createCommandBuilder('beacon-utils')
-                              .intArg('size')
-                              .suggestMatching('3', '5', '9')
-                              .executes(JavaWrapper.methodToJava((context) => {
-                                  const player = Player.getPlayer();
-                                  const pos = player.getBlockPos();
-                                  Chat.log(`[beacon-utils] ${placeBeacon(context.getArg('size'), pos)?.message}`);
-                              }))
-                              .blockPosArg('pos')
-                              .executes(JavaWrapper.methodToJava((context) => {
-                                    const pos = context.getArg('pos');
-                                    const size = context.getArg('size');
-                                    Chat.log(`[beacon-utils] ${placeBeacon(size, pos)?.message}`);
-                              }));
+    .intArg('size')
+    .suggestMatching('3', '5', '9')
+    .executes(
+        JavaWrapper.methodToJava((context) => {
+            const player = Player.getPlayer();
+            const pos = player.getBlockPos();
+            Chat.log(`[beacon-utils] ${placeBeacon(context.getArg('size'), pos)?.message}`);
+        })
+    )
+    .blockPosArg('pos')
+    .executes(
+        JavaWrapper.methodToJava((context) => {
+            const pos = context.getArg('pos');
+            const size = context.getArg('size');
+            Chat.log(`[beacon-utils] ${placeBeacon(size, pos)?.message}`);
+        })
+    );
 builder.register();
 
 function pyramidVolume(size: number) {
@@ -38,7 +42,7 @@ function placeBeacon(size: number, pos: BlockPosHelper, baseBlock = 'minecraft:i
     if (World.getBlock(pos).getBlockStateHelper().isSolid()) {
         pos = pos.offset(0, 1, 0);
     }
-    
+
     const player = Player.getPlayer();
     const x = pos.getX();
     const y = pos.getY();
@@ -89,7 +93,7 @@ function placeBeacon(size: number, pos: BlockPosHelper, baseBlock = 'minecraft:i
                 if (!block.getBlockStateHelper().isAir()) {
                     continue;
                 }
-                
+
                 player.interactBlock(x + i, y + verticalOffset, z + j, 0, false);
             }
         }

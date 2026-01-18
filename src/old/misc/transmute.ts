@@ -1,18 +1,21 @@
-const reagents = [{
-    id: 'minecraft:gunpowder',
-    count: 17
-}, {
-    id: 'minecraft:redstone',
-    count: 17
-}];
+const reagents = [
+    {
+        id: 'minecraft:gunpowder',
+        count: 17,
+    },
+    {
+        id: 'minecraft:redstone',
+        count: 17,
+    },
+];
 const input = {
     id: 'minecraft:coal',
-    count: 12
+    count: 12,
 };
 
 const output = {
     id: 'minecraft:diamond',
-    count: 1
+    count: 1,
 };
 
 function findItem(id: string) {
@@ -30,7 +33,6 @@ function dropItemsAtAngle(id: string, count: number, pitch: number, yaw: number)
     if (foundItems.length === 0) {
         throw `Item ${id} not found`;
     }
-
 
     for (let i = 0; i < count; i++) {
         inventory.dropSlot(foundItems[0], false);
