@@ -49,6 +49,16 @@ type Command = {
 };
 
 class CommandBuilderWrapper {
+    private NON_OR_INCREASING_KEYS = [
+        'children',
+        'executes',
+        'executesAsync',
+        'suggest',
+        'suggestMatching',
+        'suggestIdentifier',
+        'suggestBlockPositions',
+    ];
+
     private builder: CommandBuilder;
     constructor(commandName: string) {
         this.builder = Chat.getCommandManager().createCommandBuilder(commandName);
@@ -66,7 +76,7 @@ class CommandBuilderWrapper {
         const applyArgs = (node: Command, builder: CommandBuilder): CommandBuilder => {
             let nodeSum = 1;
             for (const key in node) {
-                if (key !== 'children' && key !== 'executes' && key !== 'executesAsync' && key !== 'suggest') {
+                if (!this.NON_OR_INCREASING_KEYS.includes(key) && node[key as keyof Command] !== undefined) {
                     nodeSum++;
                 }
             }
