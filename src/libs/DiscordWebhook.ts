@@ -132,7 +132,7 @@ export class DiscordWebhook {
                 return false;
             }
         } catch (error) {
-            Chat.log(`§cDiscord webhook exception: ${error}`);
+            Chat.log(`§cDiscord webhook exception: ${error} for request payload: ${JSON.stringify(payload)}`);
             return false;
         }
     }
