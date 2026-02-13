@@ -3,7 +3,7 @@ JsMacros.assertEvent(event, 'Service');
 // Whether to assist with the current sieving, or to continue until no more items are left
 const SHOULD_CONTINUE = true;
 
-const sieveRegex = /exdeorum:[a-z]+_sieve/;
+const sieveRegex = /(exdeorum|exnihilosequentia):[a-z]+_sieve/;
 
 function getSieveProgress(blockPos: BlockPosHelper): number {
     const block = World.getBlock(blockPos);
@@ -28,10 +28,13 @@ function getSieveContents(blockPos: BlockPosHelper): string | null {
         return null;
     }
 
-    const contents = block.getNBT().get('contents');
+    let contents = block.getNBT().get('contents');
     if (contents == null) {
-        if (!flag) flag = true;
-        return null;
+        contents = block.getNBT().get('block');
+        if (contents == null) {
+            if (!flag) flag = true;
+            return null;
+        }
     }
 
     const str = contents.asCompoundHelper().get('id').asString();
