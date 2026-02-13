@@ -1,3 +1,4 @@
+const Thread = Java.type('java.lang.Thread');
 const inv = Player.openInventory;
 
 function instantPress(keybind: string) {
@@ -27,12 +28,14 @@ function getPebbleSlots() {
 }
 
 // Get pebbles
+const totalPebbles = 64 * 9 * 5;
 if (inv().getSlot(inv().getMap().hotbar[inv().getSelectedHotbarSlotIndex()]).getItemId() === 'minecraft:air') {
-    Chat.log(`Getting ${64 * 128} pebbles`);
+    Chat.log(`Getting ${totalPebbles} pebbles`);
     KeyBind.pressKeyBind('key.sneak');
     Client.waitTick(1);
-    for (let i = 0; i < 64 * 128; i++) {
+    for (let i = 0; i < totalPebbles; i++) {
         instantPress('key.use');
+        Thread.sleep(1);
     }
     Client.waitTick(40);
 }
