@@ -1,5 +1,6 @@
-import { inv } from '../donut-smp-bone-macro/util';
 import ChatHelper from './ChatHelper';
+
+const inv = Player.openInventory;
 
 /**
  * Splits a stack in a given slot to achieve a target count in the target slot.
